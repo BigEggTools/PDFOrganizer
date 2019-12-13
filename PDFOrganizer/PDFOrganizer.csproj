@@ -33,6 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BigEgg.Core, Version=2.1.1.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BigEgg.Core.2.1.1.6\lib\net452\BigEgg.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="BigEgg.Tools.ConsoleExtension, Version=1.0.1.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BigEgg.Tools.ConsoleExtension.1.0.1.6\lib\net452\BigEgg.Tools.ConsoleExtension.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
