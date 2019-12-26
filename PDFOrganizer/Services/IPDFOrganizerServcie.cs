@@ -6,8 +6,8 @@ namespace BigEgg.PDFOrganizer.Services
 {
     public interface IPDFOrganizerServcie
     {
-        Task Merge(string source, string target, string prefix, bool view, IProgress<IProgressReport> progress);
+        Task Merge(string sourceDirectory, string targetFile, string filterPrefix, bool viewFinalOutput, IProgress<IProgressReport> progress);
 
-        Task Split(string source, string target, string prefix, IProgress<IProgressReport> progress);
+        Task Split(string sourceFile, string targetDirectory, string namePrefix, IProgress<IProgressReport> progress);
     }
 }

@@ -12,24 +12,24 @@ namespace BigEgg.PDFOrganizer.Services
     [Export(typeof(IPDFOrganizerServcie))]
     public class PDFOrganizerServcie : IPDFOrganizerServcie
     {
-        public Task Merge(string source, string target, string prefix, bool view, IProgress<IProgressReport> progress)
+        public Task Merge(string sourceDirectory, string targetFile, string filterPrefix, bool viewFinalOutput, IProgress<IProgressReport> progress)
         {
-            Preconditions.NotNullOrWhiteSpace(source, nameof(source));
-            Preconditions.Check(Directory.Exists(source), "Source sould be an existed directory.");
+            Preconditions.NotNullOrWhiteSpace(sourceDirectory, nameof(sourceDirectory));
+            Preconditions.Check(Directory.Exists(sourceDirectory), "Source sould be an existed directory.");
 
             return Task.Factory.StartNew(() =>
             {
                 Trace.Indent();
-                Trace.TraceInformation($"Process the parameters target: {target}.");
-                if (string.IsNullOrWhiteSpace(target)) { target = "Merge_File.pdf"; }
-                if (!target.EndsWith(".pdf")) { target += ".pdf"; }
-                Trace.TraceInformation($"Target hand been process to {target}.");
+                Trace.TraceInformation($"Process the parameters target: {targetFile}.");
+                if (string.IsNullOrWhiteSpace(targetFile)) { targetFile = "Merge_File.pdf"; }
+                if (!targetFile.EndsWith(".pdf")) { targetFile += ".pdf"; }
+                Trace.TraceInformation($"Target hand been process to {targetFile}.");
 
                 // Get the files
-                Trace.TraceInformation($"Get the files from {source} with prefix {prefix}.");
-                var files = string.IsNullOrWhiteSpace(prefix)
-                    ? Directory.GetFiles(source, "*.pdf", SearchOption.TopDirectoryOnly)
-                    : Directory.GetFiles(source, $"{prefix}*.pdf", SearchOption.TopDirectoryOnly);
+                Trace.TraceInformation($"Get the files from {sourceDirectory} with prefix {filterPrefix}.");
+                var files = string.IsNullOrWhiteSpace(filterPrefix)
+                    ? Directory.GetFiles(sourceDirectory, "*.pdf", SearchOption.TopDirectoryOnly)
+                    : Directory.GetFiles(sourceDirectory, $"{filterPrefix}*.pdf", SearchOption.TopDirectoryOnly);
 
                 // Open the output document
                 PdfDocument outputDocument = new PdfDocument();
@@ -39,7 +39,7 @@ namespace BigEgg.PDFOrganizer.Services
                 int mergedFileCount = 0;
                 foreach (string file in files)
                 {
-                    reportProgress(progress, new ProgressReport(mergedFileCount, files.Length));
+                    ReportProgress(progress, new ProgressReport(mergedFileCount, files.Length));
 
                     // Open the document to import pages from it.
                     PdfDocument inputDocument = PdfReader.Open(file, PdfDocumentOpenMode.Import);
@@ -54,44 +54,44 @@ namespace BigEgg.PDFOrganizer.Services
                         outputDocument.AddPage(page);
                     }
                 }
-                reportProgress(progress, new ProgressReport(files.Length, files.Length));
+                ReportProgress(progress, new ProgressReport(files.Length, files.Length));
 
                 // Save the document
-                Trace.TraceInformation($"Save the output file {target}.");
-                outputDocument.Save(target);
+                Trace.TraceInformation($"Save the output file {targetFile}.");
+                outputDocument.Save(targetFile);
 
-                if (view)   // start a viewer. 
+                if (viewFinalOutput)   // start a viewer. 
                 {
-                    Console.WriteLine($"Show the merged file {target}.");
-                    Process.Start(target);
+                    Console.WriteLine($"Show the merged file {targetFile}.");
+                    Process.Start(targetFile);
                 }
 
                 Trace.Unindent();
             });
         }
 
-        public Task Split(string source, string target, string prefix, IProgress<IProgressReport> progress)
+        public Task Split(string sourceFile, string targetDirectory, string namePrefix, IProgress<IProgressReport> progress)
         {
-            Preconditions.NotNullOrWhiteSpace(source, nameof(source));
-            Preconditions.Check(File.Exists(source), "Source should be an existed file.");
-            Preconditions.Check(!source.EndsWith(".pdf"), "Source should be a file with pdf as extension.");
+            Preconditions.NotNullOrWhiteSpace(sourceFile, nameof(sourceFile));
+            Preconditions.Check(File.Exists(sourceFile), "Source should be an existed file.");
+            Preconditions.Check(sourceFile.EndsWith(".pdf"), "Source should be a file with pdf as extension.");
 
             return Task.Factory.StartNew(() =>
             {
                 Trace.Indent();
-                Trace.TraceInformation($"Process the parameters prefix: {prefix}.");
-                if (!target.EndsWith("/")) { target += "/"; }
-                if (string.IsNullOrWhiteSpace(prefix)) { prefix = source.Substring(0, source.Length - 4); }
-                Trace.TraceInformation($"Prefix hand been process to {prefix}.");
+                Trace.TraceInformation($"Process the parameters prefix: {namePrefix}.");
+                if (!targetDirectory.EndsWith("/")) { targetDirectory += "/"; }
+                if (string.IsNullOrWhiteSpace(namePrefix)) { namePrefix = Path.GetFileNameWithoutExtension(sourceFile); }
+                Trace.TraceInformation($"Prefix hand been process to {namePrefix}.");
+                if (!Directory.Exists(targetDirectory)) { Directory.CreateDirectory(targetDirectory); }
 
                 // Open the file
-                PdfDocument inputDocument = PdfReader.Open(source, PdfDocumentOpenMode.Import);
+                PdfDocument inputDocument = PdfReader.Open(sourceFile, PdfDocumentOpenMode.Import);
 
                 Console.WriteLine($"Start split the file. Total page number: {inputDocument.PageCount}.");
-                string name = Path.GetFileNameWithoutExtension(source);
                 for (int idx = 0; idx < inputDocument.PageCount; idx++)
                 {
-                    reportProgress(progress, new ProgressReport(idx, inputDocument.PageCount));
+                    ReportProgress(progress, new ProgressReport(idx, inputDocument.PageCount));
 
                     // Create new document
                     PdfDocument outputDocument = new PdfDocument();
@@ -101,15 +101,15 @@ namespace BigEgg.PDFOrganizer.Services
 
                     // Add the page and save it
                     outputDocument.AddPage(inputDocument.Pages[idx]);
-                    outputDocument.Save($"{target}{prefix} - Page {idx + 1}_inputDocument.PageCount.pdf");
+                    outputDocument.Save($"{targetDirectory}{namePrefix} - Page {idx + 1}_{inputDocument.PageCount}.pdf");
                 }
-                reportProgress(progress, new ProgressReport(inputDocument.PageCount, inputDocument.PageCount));
+                ReportProgress(progress, new ProgressReport(inputDocument.PageCount, inputDocument.PageCount));
 
                 Trace.Unindent();
             });
         }
 
-        private void reportProgress(IProgress<IProgressReport> progress, IProgressReport report)
+        private void ReportProgress(IProgress<IProgressReport> progress, IProgressReport report)
         {
             if (progress != null)
             {

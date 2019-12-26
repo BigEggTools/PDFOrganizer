@@ -29,9 +29,9 @@ namespace BigEgg.PDFOrganizer
             var handlers = container.GetExportedValues<IArgumentHandler>();
             var handler = handlers.First(h => h.CanHandle(parameter));
 
-            Console.Write("Find Handle to Handle this Parameter.");
+            Console.WriteLine("Find Handle to Handle this Parameter.");
             handler.Handle(parameter).Wait();
-            Console.Write("Done.");
+            Console.WriteLine("Done.");
         }
 
         private static void Initialize()
