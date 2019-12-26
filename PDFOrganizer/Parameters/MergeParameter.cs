@@ -1,8 +1,8 @@
 ﻿using BigEgg.Tools.ConsoleExtension.Parameters;
 
-namespace PDFOrganizer.Parameters
+namespace BigEgg.PDFOrganizer.Parameters
 {
-    [Command("generate", "Generate the markdown file for one folder")]
+    [Command("merge", "Merge the PDF files in source directory")]
     public class MergeParameter
     {
         [StringProperty("source", "s", "The source directory", Required = true)]

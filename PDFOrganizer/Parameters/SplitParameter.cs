@@ -1,8 +1,8 @@
 ﻿using BigEgg.Tools.ConsoleExtension.Parameters;
 
-namespace PDFOrganizer.Parameters
+namespace BigEgg.PDFOrganizer.Parameters
 {
-    [Command("generate", "Generate the markdown file for one folder")]
+    [Command("split", "Split the source PDF file per page")]
     public class SplitParameter
     {
         [StringProperty("source", "s", "The source PDF file", Required = true)]
