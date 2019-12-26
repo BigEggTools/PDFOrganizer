@@ -35,7 +35,7 @@ namespace BigEgg.PDFOrganizer.ArgumentHandlers
                 TextProgressBar.Draw(report.Current, report.Total);
             });
 
-            await pdfOrganizerService.Merge(parameter.Source, parameter.Target, parameter.Prefix, progress);
+            await pdfOrganizerService.Merge(parameter.Source, parameter.Target, parameter.Prefix, parameter.ViewAfterComplete, progress);
         }
     }
 }

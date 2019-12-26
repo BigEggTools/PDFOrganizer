@@ -13,5 +13,8 @@ namespace BigEgg.PDFOrganizer.Parameters
 
         [StringProperty("prefix", "p", "The prefix filter in the source directory")]
         public string Prefix { get; set; }
+
+        [BooleanProperty("view", "v", "Open the merged file after merge complete")]
+        public bool ViewAfterComplete { get; set; }
     }
 }
