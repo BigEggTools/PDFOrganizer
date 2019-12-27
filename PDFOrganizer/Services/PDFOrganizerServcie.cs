@@ -1,10 +1,14 @@
-﻿using BigEgg.Progress;
+﻿using BigEgg.PDFOrganizer.Models;
+using BigEgg.Progress;
+using Newtonsoft.Json;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BigEgg.PDFOrganizer.Services
@@ -104,6 +108,82 @@ namespace BigEgg.PDFOrganizer.Services
                     outputDocument.Save($"{targetDirectory}{namePrefix} - Page {idx + 1}_{inputDocument.PageCount}.pdf");
                 }
                 ReportProgress(progress, new ProgressReport(inputDocument.PageCount, inputDocument.PageCount));
+
+                Trace.Unindent();
+            });
+        }
+
+        public Task SplitBlock(string sourceFile, string targetDirectory, string settingFile, IProgress<IProgressReport> progress)
+        {
+            Preconditions.NotNullOrWhiteSpace(sourceFile, nameof(sourceFile));
+            Preconditions.Check(File.Exists(sourceFile), "Source should be an existed file.");
+            Preconditions.Check(sourceFile.EndsWith(".pdf"), "Source should be a file with pdf as extension.");
+
+            Preconditions.NotNullOrWhiteSpace(settingFile, nameof(settingFile));
+            Preconditions.Check(File.Exists(settingFile), "Setting should be an existed file.");
+            Preconditions.Check(settingFile.EndsWith(".json"), "Setting should be a file with json as extension.");
+
+            return Task.Factory.StartNew(() =>
+            {
+                Trace.Indent();
+
+                // Open the file
+                PdfDocument inputDocument = PdfReader.Open(sourceFile, PdfDocumentOpenMode.Import);
+
+                if (!Directory.Exists(targetDirectory)) { Directory.CreateDirectory(targetDirectory); }
+                if (!targetDirectory.EndsWith("/")) { targetDirectory += "/"; }
+
+                List<SplitBlockModel> settings = null;
+                try
+                {
+                    Trace.TraceInformation($"Read setting from file {settingFile}.");
+                    settings = JsonConvert.DeserializeObject<List<SplitBlockModel>>(File.ReadAllText(settingFile));
+
+                    if (settings.Any(s => s.StartPage > s.EndPage))
+                    {
+                        Console.WriteLine("Setting not valid, start page index should not larger than end page index.");
+                        return;
+                    }
+
+                    if (settings.Any(s => s.StartPage > inputDocument.PageCount || s.StartPage <= 0))
+                    {
+                        Console.WriteLine("Setting not valid, start page index should larger than 0 and smaller or equal to source file page count.");
+                        return;
+                    }
+
+                    if (settings.Any(s => s.EndPage > inputDocument.PageCount || s.EndPage <= 0))
+                    {
+                        Console.WriteLine("Setting not valid, end page index should larger than 0 and smaller or equal to source file page count.");
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Cannot read the settings, please check the document and fix the setting file.");
+                    return;
+                }
+
+                Console.WriteLine($"Start split the file to {settings.Count} block. Total page number: {inputDocument.PageCount}.");
+                string name = Path.GetFileNameWithoutExtension(sourceFile);
+                for (int idx = 0; idx < settings.Count; idx++)
+                {
+                    var setting = settings[idx];
+
+                    ReportProgress(progress, new ProgressReport(idx, settings.Count));
+
+                    // Create new document
+                    PdfDocument outputDocument = new PdfDocument();
+                    outputDocument.Version = inputDocument.Version;
+                    outputDocument.Info.Title = $"{setting.Name}";
+                    outputDocument.Info.Creator = inputDocument.Info.Creator;
+
+                    // Add the pages and save it
+                    for (int pageId = setting.StartPage; pageId <= setting.EndPage; pageId++)
+                        outputDocument.AddPage(inputDocument.Pages[pageId - 1]);
+
+                    outputDocument.Save($"{targetDirectory}{setting.Name}.pdf");
+                }
+                ReportProgress(progress, new ProgressReport(settings.Count, settings.Count));
 
                 Trace.Unindent();
             });

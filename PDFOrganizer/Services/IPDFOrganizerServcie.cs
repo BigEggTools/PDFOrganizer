@@ -9,5 +9,7 @@ namespace BigEgg.PDFOrganizer.Services
         Task Merge(string sourceDirectory, string targetFile, string filterPrefix, bool viewFinalOutput, IProgress<IProgressReport> progress);
 
         Task Split(string sourceFile, string targetDirectory, string namePrefix, IProgress<IProgressReport> progress);
+
+        Task SplitBlock(string sourceFile, string targetDirectory, string settingFile, IProgress<IProgressReport> progress);
     }
 }

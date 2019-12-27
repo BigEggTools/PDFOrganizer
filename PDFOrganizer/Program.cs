@@ -22,8 +22,9 @@ namespace BigEgg.PDFOrganizer
                     container,
                     ParserSettings.Builder().WithDefault().CaseSensitive(false).ComputeDisplayWidth().Build())
                 .Parse(args,
+                    typeof(MergeParameter),
                     typeof(SplitParameter),
-                    typeof(MergeParameter));
+                    typeof(SplitBlockParameter));
             if (parameter == null) { return; }
 
             var handlers = container.GetExportedValues<IArgumentHandler>();

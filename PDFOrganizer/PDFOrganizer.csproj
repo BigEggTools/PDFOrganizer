@@ -42,6 +42,9 @@
     <Reference Include="BigEgg.Tools.ConsoleExtension, Version=1.0.1.6, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\BigEgg.Tools.ConsoleExtension.1.0.1.6\lib\net452\BigEgg.Tools.ConsoleExtension.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PdfSharp, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
     </Reference>
@@ -61,9 +64,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentHandlers\IArgumentHandler.cs" />
+    <Compile Include="ArgumentHandlers\SplitBlockHandler.cs" />
     <Compile Include="ArgumentHandlers\SplitPDFHandler.cs" />
     <Compile Include="ArgumentHandlers\MergePDFHandler.cs" />
+    <Compile Include="Models\SplitBlockModel.cs" />
     <Compile Include="Parameters\MergeParameter.cs" />
+    <Compile Include="Parameters\SplitBlockParameter.cs" />
     <Compile Include="Parameters\SplitParameter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
