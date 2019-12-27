@@ -78,7 +78,7 @@ namespace BigEgg.PDFOrganizer.Services
         {
             Preconditions.NotNullOrWhiteSpace(sourceFile, nameof(sourceFile));
             Preconditions.Check(File.Exists(sourceFile), "Source should be an existed file.");
-            Preconditions.Check(sourceFile.EndsWith(".pdf"), "Source should be a file with pdf as extension.");
+            Preconditions.Check(sourceFile.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase), "Source should be a file with pdf as extension.");
 
             return Task.Factory.StartNew(() =>
             {
@@ -117,11 +117,11 @@ namespace BigEgg.PDFOrganizer.Services
         {
             Preconditions.NotNullOrWhiteSpace(sourceFile, nameof(sourceFile));
             Preconditions.Check(File.Exists(sourceFile), "Source should be an existed file.");
-            Preconditions.Check(sourceFile.EndsWith(".pdf"), "Source should be a file with pdf as extension.");
+            Preconditions.Check(sourceFile.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase), "Source should be a file with pdf as extension.");
 
             Preconditions.NotNullOrWhiteSpace(settingFile, nameof(settingFile));
             Preconditions.Check(File.Exists(settingFile), "Setting should be an existed file.");
-            Preconditions.Check(settingFile.EndsWith(".json"), "Setting should be a file with json as extension.");
+            Preconditions.Check(settingFile.EndsWith(".json", StringComparison.OrdinalIgnoreCase), "Setting should be a file with json as extension.");
 
             return Task.Factory.StartNew(() =>
             {

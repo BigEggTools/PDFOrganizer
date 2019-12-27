@@ -11,7 +11,7 @@ namespace BigEgg.PDFOrganizer.Parameters
         [StringProperty("target", "t", "The target directory, same as source PDF file if not specific")]
         public string Target { get; set; }
 
-        [StringProperty("setting", "j", "The setting file", Required = true)]
+        [StringProperty("config", "j", "The config file", Required = true)]
         public string Setting { get; set; }
     }
 }
