@@ -35,6 +35,8 @@ namespace BigEgg.PDFOrganizer.Services
                     ? Directory.GetFiles(sourceDirectory, "*.pdf", SearchOption.TopDirectoryOnly)
                     : Directory.GetFiles(sourceDirectory, $"{filterPrefix}*.pdf", SearchOption.TopDirectoryOnly);
 
+                files = files.OrderBy(file => file).ToArray();
+
                 // Open the output document
                 PdfDocument outputDocument = new PdfDocument();
 
