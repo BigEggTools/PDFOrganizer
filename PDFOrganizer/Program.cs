@@ -24,7 +24,8 @@ namespace BigEgg.PDFOrganizer
                 .Parse(args,
                     typeof(MergeParameter),
                     typeof(SplitParameter),
-                    typeof(SplitBlockParameter));
+                    typeof(SplitBlockParameter),
+                    typeof(CompressParameter));
             if (parameter == null) { return; }
 
             var handlers = container.GetExportedValues<IArgumentHandler>();

@@ -191,6 +191,57 @@ namespace BigEgg.PDFOrganizer.Services
             });
         }
 
+        public Task Compress(string sourceFile, string targetFile, bool viewFinalOutput, Progress<IProgressReport> progress)
+        {
+            Preconditions.NotNullOrWhiteSpace(sourceFile, nameof(sourceFile));
+            Preconditions.Check(File.Exists(sourceFile), "Source should be an existed file.");
+            Preconditions.Check(sourceFile.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase), "Source should be a file with pdf as extension.");
+
+            return Task.Factory.StartNew(() =>
+            {
+                Trace.Indent();
+                Trace.TraceInformation($"Process the parameters target: {targetFile}.");
+                if (string.IsNullOrWhiteSpace(targetFile)) { targetFile = "Merge_File.pdf"; }
+                if (!targetFile.EndsWith(".pdf")) { targetFile += ".pdf"; }
+                Trace.TraceInformation($"Target hand been process to {targetFile}.");
+
+                // Open the file
+                PdfDocument inputDocument = PdfReader.Open(sourceFile, PdfDocumentOpenMode.Import);
+
+                // Create new document
+                PdfDocument outputDocument = new PdfDocument();
+                outputDocument.Version = inputDocument.Version;
+                outputDocument.Info.Title = inputDocument.Info.Title;
+                outputDocument.Info.Creator = inputDocument.Info.Creator;
+                outputDocument.Options.FlateEncodeMode = PdfFlateEncodeMode.BestCompression;
+                outputDocument.Options.UseFlateDecoderForJpegImages = PdfUseFlateDecoderForJpegImages.Automatic;
+                outputDocument.Options.NoCompression = false;
+                outputDocument.Options.CompressContentStreams = true;
+
+                Console.WriteLine($"Start compress the file. Total page number: {inputDocument.PageCount}.");
+                for (int idx = 0; idx < inputDocument.PageCount; idx++)
+                {
+                    ReportProgress(progress, new ProgressReport(idx, inputDocument.PageCount));
+
+                    // Add the page and save it
+                    outputDocument.AddPage(inputDocument.Pages[idx]);
+                }
+                ReportProgress(progress, new ProgressReport(inputDocument.PageCount, inputDocument.PageCount));
+
+                // Save the document
+                Trace.TraceInformation($"Save the output file {targetFile}.");
+                outputDocument.Save(targetFile);
+
+                if (viewFinalOutput)   // start a viewer. 
+                {
+                    Console.WriteLine($"Show the merged file {targetFile}.");
+                    Process.Start(targetFile);
+                }
+
+                Trace.Unindent();
+            });
+        }
+
         private void ReportProgress(IProgress<IProgressReport> progress, IProgressReport report)
         {
             if (progress != null)
