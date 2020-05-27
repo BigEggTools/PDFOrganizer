@@ -13,5 +13,7 @@ namespace BigEgg.PDFOrganizer.Services
         Task SplitBlock(string sourceFile, string targetDirectory, string settingFile, IProgress<IProgressReport> progress);
 
         Task Compress(string sourceFile, string targetFile, bool viewFinalOutput, Progress<IProgressReport> progress);
+
+        Task ConvertImage(string sourceFile, string targetFile, bool landscape, bool letter, bool viewFinalOutput, Progress<IProgressReport> progress);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using BigEgg.PDFOrganizer.Models;
 using BigEgg.Progress;
 using Newtonsoft.Json;
+using PdfSharp;
+using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
@@ -248,6 +250,48 @@ namespace BigEgg.PDFOrganizer.Services
             {
                 progress.Report(report);
             }
+        }
+
+        public Task ConvertImage(string sourceFile, string targetFile, bool landscape, bool usLetter, bool viewFinalOutput, Progress<IProgressReport> progress)
+        {
+            Preconditions.NotNullOrWhiteSpace(sourceFile, nameof(sourceFile));
+            Preconditions.Check(File.Exists(sourceFile), "Source should be an existed file.");
+            Preconditions.Check(sourceFile.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase), "Source should be a file with jpg as extension.");
+
+            return Task.Factory.StartNew(() =>
+            {
+                Trace.Indent();
+                Trace.TraceInformation($"Process the parameters target: {targetFile}.");
+                if (string.IsNullOrWhiteSpace(targetFile)) { targetFile = Path.GetFileNameWithoutExtension(sourceFile); }
+                if (!targetFile.EndsWith(".pdf")) { targetFile += ".pdf"; }
+                Trace.TraceInformation($"Target hand been process to {targetFile}.");
+
+                PdfDocument document = new PdfDocument();
+                PdfPage page = document.AddPage();
+                if (landscape)
+                    page.Orientation = PageOrientation.Landscape;
+                else
+                    page.Orientation = PageOrientation.Portrait;
+                if (usLetter)
+                    page.Size = PageSize.Letter;
+                else
+                    page.Size = PageSize.A4;
+
+                Console.WriteLine($"Start convert image to pdf.");
+                XGraphics gfx = XGraphics.FromPdfPage(page, XPageDirection.Downwards);
+                gfx.DrawImage(XImage.FromFile(sourceFile), 0, 0);
+
+                Trace.TraceInformation($"Save the output file {targetFile}.");
+                document.Save(targetFile);
+
+                if (viewFinalOutput)   // start a viewer. 
+                {
+                    Console.WriteLine($"Show the merged file {targetFile}.");
+                    Process.Start(targetFile);
+                }
+
+                Trace.Unindent();
+            });
         }
     }
 }

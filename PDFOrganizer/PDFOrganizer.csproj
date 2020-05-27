@@ -66,10 +66,12 @@
     <Compile Include="ArgumentHandlers\CompressHandler.cs" />
     <Compile Include="ArgumentHandlers\IArgumentHandler.cs" />
     <Compile Include="ArgumentHandlers\SplitBlockHandler.cs" />
+    <Compile Include="ArgumentHandlers\ConvertImageHandler.cs" />
     <Compile Include="ArgumentHandlers\SplitPDFHandler.cs" />
     <Compile Include="ArgumentHandlers\MergePDFHandler.cs" />
     <Compile Include="Models\SplitBlockModel.cs" />
     <Compile Include="Parameters\CompressParameter.cs" />
+    <Compile Include="Parameters\ConvertImageParameter.cs" />
     <Compile Include="Parameters\MergeParameter.cs" />
     <Compile Include="Parameters\SplitBlockParameter.cs" />
     <Compile Include="Parameters\SplitParameter.cs" />
